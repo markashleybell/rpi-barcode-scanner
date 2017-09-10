@@ -1,35 +1,26 @@
+import string
+import constants
 
-import Adafruit_GPIO.SPI as SPI
-import Adafruit_SSD1306
+from evdev import InputDevice, ecodes
+from evdev.util import categorize
+from oleddisplay import display_text, clear_display
 
-from PIL import Image
-from PIL import ImageDraw
-from PIL import ImageFont
+display_text("Ready")
 
-# 128x32 display with hardware I2C
-disp = Adafruit_SSD1306.SSD1306_128_32(rst=None)
-disp.begin()
+values = "X^1234567890XXXXqwertzuiopXXXXasdfghjklXXXXXyxcvbnmXXXXXXXXXXXXXXXXXXXXXXX"
 
-# Clear the display
-disp.clear()
-disp.display()
+device = InputDevice('/dev/input/by-id/usb-USB_Adapter_USB_Device-event-kbd')
 
-width = disp.width
-height = disp.height
+output = []
 
-# Create blank image for drawing (mode '1' represents 1-bit color)
-image = Image.new('1', (width, height))
-
-# Get drawing object
-draw = ImageDraw.Draw(image)
-
-# Clear the image
-draw.rectangle((0, 0, width, height), outline=0, fill=0)
-
-# Load font
-font = ImageFont.truetype('VCR_OSD_MONO_1.001.ttf', 21)
-
-draw.text((14, 8), "12345678", font=font, fill=255)
-
-disp.image(image)
-disp.display()
+try:
+    for event in device.read_loop():
+        if event.type == ecodes.EV_KEY and event.value == constants.UP:
+            if event.code == ecodes.KEY_ENTER:
+                display_text(''.join(output))
+                output = []
+            else:
+                output.append(values[event.code])
+except:   
+    clear_display() 
+    print("EXIT")
