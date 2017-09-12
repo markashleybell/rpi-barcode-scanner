@@ -1,5 +1,6 @@
 import string
 import constants
+import requests
 
 from evdev import InputDevice, ecodes
 from evdev.util import categorize
@@ -17,7 +18,9 @@ try:
     for event in device.read_loop():
         if event.type == ecodes.EV_KEY and event.value == constants.UP:
             if event.code == ecodes.KEY_ENTER:
-                display_text(''.join(output))
+                code = ''.join(output)
+                display_text(code)
+                requests.post('http://api.markb.com/rpi/registercode', data = {'code': code})
                 output = []
             else:
                 output.append(values[event.code])
