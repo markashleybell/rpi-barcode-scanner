@@ -20,7 +20,7 @@ try:
             if event.code == ecodes.KEY_ENTER:
                 code = ''.join(output)
                 display_text(code)
-                requests.post('http://api.markb.com/rpi/registercode', data = {'code': code})
+                requests.post('http://192.168.78.12:8080/registercode', data = {'code': code})
                 output = []
             else:
                 output.append(values[event.code])
